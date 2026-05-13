@@ -9,6 +9,7 @@ from agents.agents import (
     budget_estimator_agent,
     verification_agent,
 )
+from observability import observe_agent
 
 
 def route_after_verification(state: TravelState) -> str:
@@ -25,24 +26,14 @@ def build_explore_graph():
     """Graph for Use Case 1: Explore Places"""
     graph = StateGraph(TravelState)
 
-    graph.add_node("orchestrator", orchestrator_agent)
-    graph.add_node("destination_discovery", destination_discovery_agent)
-    graph.add_node("verification", verification_agent)
-    graph.add_node("finalize", orchestrator_final_agent)
+    graph.add_node("orchestrator", observe_agent("orchestrator", orchestrator_agent))
+    graph.add_node("destination_discovery", observe_agent("destination_discovery", destination_discovery_agent))
+    graph.add_node("verification", observe_agent("verification", verification_agent))
 
     graph.set_entry_point("orchestrator")
     graph.add_edge("orchestrator", "destination_discovery")
     graph.add_edge("destination_discovery", "verification")
-
-    graph.add_conditional_edges(
-        "verification",
-        lambda s: "finalize" if s.get("verification_passed", True) or s.get("retry_count", 0) >= 2 else "destination_discovery",
-        {
-            "finalize": "finalize",
-            "destination_discovery": "destination_discovery",
-        }
-    )
-    graph.add_edge("finalize", END)
+    graph.add_edge("verification", END)
 
     return graph.compile()
 
@@ -51,13 +42,13 @@ def build_plan_graph():
     """Graph for Use Case 2: Plan My Trip (full pipeline)"""
     graph = StateGraph(TravelState)
 
-    graph.add_node("orchestrator", orchestrator_agent)
-    graph.add_node("destination_discovery", destination_discovery_agent)
-    graph.add_node("itinerary_planner", itinerary_planner_agent)
-    graph.add_node("transport_hotel", transport_hotel_agent)
-    graph.add_node("budget_estimator", budget_estimator_agent)
-    graph.add_node("verification", verification_agent)
-    graph.add_node("finalize", orchestrator_final_agent)
+    graph.add_node("orchestrator", observe_agent("orchestrator", orchestrator_agent))
+    graph.add_node("destination_discovery", observe_agent("destination_discovery", destination_discovery_agent))
+    graph.add_node("itinerary_planner", observe_agent("itinerary_planner", itinerary_planner_agent))
+    graph.add_node("transport_hotel", observe_agent("transport_hotel", transport_hotel_agent))
+    graph.add_node("budget_estimator", observe_agent("budget_estimator", budget_estimator_agent))
+    graph.add_node("verification", observe_agent("verification", verification_agent))
+    graph.add_node("finalize", observe_agent("finalize", orchestrator_final_agent))
 
     graph.set_entry_point("orchestrator")
     graph.add_edge("orchestrator", "destination_discovery")

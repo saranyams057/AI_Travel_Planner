@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Compass, ArrowLeft, Search, Sliders, ExternalLink, MapPin, Clock, DollarSign, ChevronRight, Loader } from 'lucide-react'
+import { observeApiCall } from '../utils/observability'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -42,9 +43,11 @@ export default function ExplorePage() {
         ? { free_text: freeText }
         : form
 
-      const res = await axios.post(`${API_BASE}/api/explore`, payload)
+      const res = await observeApiCall('explore_places', () =>
+        axios.post(`${API_BASE}/api/explore`, payload)
+      )
       setResults(res.data.destinations || [])
-    } catch (err) {
+    } catch {
       setError('Failed to fetch destinations. Please check your API keys and backend.')
     }
     setLoading(false)

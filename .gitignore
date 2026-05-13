@@ -1,0 +1,12 @@
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/logs/
+*.log
+*.log.*
+
+frontend/dist/
+frontend/node_modules/
+backend/venv/
+__pycache__/
+*.pyc

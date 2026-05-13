@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react'
 import { Compass, Map, Star, Globe, Wind, Mountain, Waves } from 'lucide-react'
 
 const heroImages = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80',
   'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80',
   'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600&q=80',
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=80',
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80',
 ]
 
 const features = [
@@ -116,8 +116,8 @@ export default function LandingPage() {
           </h1>
 
           <p style={{
-            color: 'rgba(255,255,255,0.75)', fontSize: 18, maxWidth: 560,
-            lineHeight: 1.7, marginBottom: 52, fontWeight: 300
+            color: 'rgba(249,245,244,0.8)', fontSize: 19, maxWidth: 560,
+            lineHeight: 1.7, marginBottom: 52, fontWeight: 500
           }}>
             Let AI craft your perfect travel experience — from discovering hidden gems to building a complete, verified itinerary in minutes.
           </p>

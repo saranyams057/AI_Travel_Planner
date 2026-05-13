@@ -15,6 +15,26 @@ cp .env.example .env
 uvicorn main:app --reload --port 8000
 ```
 
+## Observability
+
+The backend emits structured JSON logs for every request and every LangGraph agent step. Each request gets an `x-request-id` response header and an `x-response-time-ms` duration header.
+
+Persistent log files are written to:
+
+- `backend/logs/app.log` for all app events
+- `backend/logs/errors.log` for warnings and errors
+
+Both files rotate automatically at about 2 MB, keeping 5 backups.
+
+Useful endpoints:
+
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/metrics
+```
+
+The `/metrics` endpoint returns in-memory counters and timing summaries for HTTP routes and agent runs. The frontend also logs API timing, backend request IDs, and browser errors to the developer console.
+
 ### Step 2 — Frontend Setup
 ```bash
 cd frontend

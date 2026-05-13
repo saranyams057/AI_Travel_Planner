@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import axios from 'axios'
-import { ArrowLeft, Map, Loader, CheckCircle, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Map, Loader, CheckCircle, AlertTriangle, Download } from 'lucide-react'
 import OverviewTab from '../components/tabs/OverviewTab'
 import ItineraryTab from '../components/tabs/ItineraryTab'
 import TransportHotelsTab from '../components/tabs/TransportHotelsTab'
 import BudgetTab from '../components/tabs/BudgetTab'
 import WeatherTab from '../components/tabs/WeatherTab'
 import PrecautionsTab from '../components/tabs/PrecautionsTab'
+import { downloadPlanPdf } from '../utils/pdfReport'
+import { observeApiCall } from '../utils/observability'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -80,10 +82,12 @@ export default function PlanPage() {
     setLoadingStep(loadingSteps[0])
 
     try {
-      const res = await axios.post(`${API_BASE}/api/plan`, form, { timeout: 180000 })
+      const res = await observeApiCall('plan_trip', () =>
+        axios.post(`${API_BASE}/api/plan`, form, { timeout: 180000 })
+      )
       setResult(res.data)
       setActiveTab('overview')
-    } catch (err) {
+    } catch {
       setError('Failed to generate plan. Please check your API keys and try again.')
     }
 
@@ -261,12 +265,12 @@ export default function PlanPage() {
           <div className="fade-in-up">
             {/* Success banner */}
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 12,
+              display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
               background: 'rgba(72,187,120,0.1)', border: '1px solid rgba(72,187,120,0.3)',
               borderRadius: 'var(--radius-sm)', padding: '14px 20px', marginBottom: 32
             }}>
               <CheckCircle size={20} color="#38a169" />
-              <div>
+              <div style={{ flex: '1 1 320px' }}>
                 <span style={{ color: '#276749', fontWeight: 600, fontSize: 15 }}>
                   Your trip plan is ready!
                 </span>
@@ -277,8 +281,17 @@ export default function PlanPage() {
                     : ' • No issues found'}
                 </span>
               </div>
+              <button onClick={() => downloadPlanPdf(result)} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: 'white', border: '1px solid rgba(56,161,105,0.35)',
+                borderRadius: 999, padding: '9px 16px', cursor: 'pointer',
+                color: '#276749', fontFamily: 'var(--font-body)', fontSize: 13,
+                fontWeight: 700, boxShadow: '0 2px 8px rgba(13,17,23,0.06)'
+              }}>
+                <Download size={15} /> Download PDF
+              </button>
               <button onClick={() => setResult(null)} style={{
-                marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
+                background: 'none', border: 'none', cursor: 'pointer',
                 color: 'var(--muted)', fontFamily: 'var(--font-body)', fontSize: 13
               }}>
                 ✏️ Edit Plan
